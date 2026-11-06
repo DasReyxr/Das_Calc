@@ -20,4 +20,4 @@ ENG_PREFIXES = {
     'p': 1e-12, 'f': 1e-15
 }
 
-DIVISIONLINE = "----"
+DIVISIONLINE = "____"

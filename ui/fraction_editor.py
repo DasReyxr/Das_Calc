@@ -9,6 +9,8 @@ class FractionEditorMixin:
     def on_slash(self, event=None):
         if self.calc_mode != "ENG":
             return  # let normal DIVISIONLINE[0] in DIG
+        if getattr(self, "inline_mode", False):
+            return None   # "/" normal
         try:
             pos = self.display.index(tk.INSERT)
             line_s, col_s = pos.split(".")
@@ -197,38 +199,38 @@ class FractionEditorMixin:
         return False
 
     def on_key_release(self, event=None):
-        """Auto-expand division line to match numerator width when typing in numerator."""
-        if self.calc_mode != "ENG":
+        """Auto-expande la barra bajo el numerador donde está el cursor."""
+        if self.calc_mode != "ENG" or getattr(self, "inline_mode", False):
+            return None
+        if event and event.keysym in ("Up", "Down", "Left", "Right", "Home", "End"):
             return None
         try:
-            pos = self.display.index(tk.INSERT)
-            line = int(pos.split(".")[0])
-            
-            # Check if next line has division line (we're on numerator)
-            next_line_text = self.display.get(f"{line+1}.0", f"{line+1}.end")
-            if DIVISIONLINE in next_line_text:
-                cur_line_text = self.display.get(f"{line}.0", f"{line}.end")
-                num_len = len(cur_line_text.rstrip())
-                
-                # Find current division line start and dash count
-                div_line = line + 1
-                div_text = self.display.get(f"{div_line}.0", f"{div_line}.end")
-                
-                # Find where dashes start and end
-                dash_start = div_text.find('-')
-                if dash_start == -1:
-                    return None
-                dash_end = dash_start
-                while dash_end < len(div_text) and div_text[dash_end] == '-':
-                    dash_end += 1
-                
-                current_dash_len = dash_end - dash_start
-                needed_dash_len = max(4, num_len)  # At least 4 dashes
-                
-                if needed_dash_len > current_dash_len:
-                    # Expand the division line
-                    extra_dashes = '-' * (needed_dash_len - current_dash_len)
-                    self.display.insert(f"{div_line}.{dash_end}", extra_dashes)
+            DASH = DIVISIONLINE[0]
+            line, col = map(int, self.display.index(tk.INSERT).split("."))
+            div_line = line + 1
+            div = self.display.get(f"{div_line}.0", f"{div_line}.end")
+            if DIVISIONLINE not in div:
+                return None
+            cur = self.display.get(f"{line}.0", f"{line}.end")
+
+            # token del numerador bajo el cursor
+            a = min(col, len(cur))
+            while a > 0 and not cur[a - 1].isspace():
+                a -= 1
+            b = min(col, len(cur))
+            while b < len(cur) and not cur[b].isspace():
+                b += 1
+
+            # barra que empieza en la columna del numerador
+            if a >= len(div) or div[a] != DASH:
+                return None
+            e = a
+            while e < len(div) and div[e] == DASH:
+                e += 1
+
+            need = max(len(DIVISIONLINE), b - a)
+            if need > e - a:
+                self.display.insert(f"{div_line}.{e}", DASH * (need - (e - a)))
         except Exception:
             pass
         return None

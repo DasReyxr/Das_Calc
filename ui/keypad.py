@@ -103,3 +103,16 @@ class KeypadMixin:
         if hasattr(self, "base_mode_btn"):
             self.base_mode_btn.configure(text=f"Base: {self.base_mode}")
         self.output_label.configure(text=f"Switched to {self.base_mode}")
+
+    def toggle_keypad(self, event=None):
+        self.keypad_visible = not getattr(self, "keypad_visible", False)
+        if self.keypad_visible:
+            self.main_frame.pack(after=self.controls)   # <- antes: keypad_toggle_btn
+            self.keypad_toggle_btn.configure(text="Hide Keyboard")
+            self.geometry("900x740")
+        else:
+            self.main_frame.pack_forget()
+            self.keypad_toggle_btn.configure(text="Show Keyboard")
+            self.geometry("900x460")
+        self.display.focus_set()
+        return "break"

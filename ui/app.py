@@ -24,7 +24,7 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
         super().__init__()
         self._set_windows_app_id()
         self.title("Das Calculator")
-        self.geometry("900x700")
+        self.geometry("900x300")
         self.resizable(False, False)
         self._set_window_icon()
 
@@ -79,24 +79,51 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
         self.output_label = ctk.CTkLabel(self, text="", font=("Arial", 18))
         self.output_label.pack(pady=5)
 
-        # ------ THEME TOGGLE ---------
+
+        # ------ CONTROLS ROW ---------
+        self.inline_mode = True          # activado por defecto
+        self.keypad_visible = False      # teclado oculto al inicio
+
+        self.controls = ctk.CTkFrame(self, fg_color="transparent")
+        self.controls.pack(pady=(10, 6))
+
         self.mode_switch = ctk.CTkSwitch(
-            self,
+            self.controls,
             text="Dark Mode",
             command=self.toggle_theme,
             onvalue="dark",
-            offvalue="pink"
+            offvalue="pink",
         )
         self.mode_switch.select()
-        self.mode_switch.pack(pady=(10, 6))
+        self.mode_switch.pack(side="left", padx=10)
 
-        # ------ MODE INDICATOR (always visible above keypad) ---------
-        self.mode_indicator = ctk.CTkLabel(self, text="Mode: Degrees", font=("Arial", 14))
-        self.mode_indicator.pack(pady=2)
+        self.inline_switch = ctk.CTkSwitch(
+            self.controls,
+            text="Inline Mode",
+            command=self.sync_inline_mode,
+        )
+        self.inline_switch.select()
+        self.inline_switch.pack(side="left", padx=10)
+
+        self.keypad_toggle_btn = ctk.CTkButton(
+            self.controls,
+            text="Show Keyboard",
+            width=150,
+            command=self.toggle_keypad,
+        )
+        self.keypad_toggle_btn.pack(side="left", padx=10)
+
+        self.mode_btn = ctk.CTkButton(
+            self.controls,
+            text="Change Mode",
+            width=150,
+            command=self.toggle_mode,
+        )
+        self.mode_btn.pack(side="left", padx=10)
 
         # ------ FRAMES ---------
         self.main_frame = ctk.CTkFrame(self)
-        self.main_frame.pack()
+        # NO se empaqueta aquí: el teclado inicia oculto
 
         self.keypad_frame = ctk.CTkFrame(self.main_frame)
         self.keypad_frame.grid(row=0, column=0, padx=10)
@@ -109,21 +136,28 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
         self.history_box.pack(padx=4, pady=4)
         self.history_box.bind("<Button-1>", self.select_history)
 
+    
         # ----- MODES ---------
         self.calc_mode = "ENG"
         self.base_mode = "DEC"  # only used in programmer mode
 
-        self.mode_btn = ctk.CTkButton(
-            self,
-            text="Mode: Degrees",
-            width=200,
-            command=self.toggle_mode
-        )
-        self.mode_btn.pack(pady=5)
+                
+        
+        self.display.bind("<Control-z>", self.undo)
+        self.display.bind("<Control-Z>", self.undo)   # con Bloq Mayús
+        self.display.bind("<Control-y>", self.redo)
+        self.display.bind("<Control-Y>", self.redo)
 
+        self.display.bind("<Control-a>", self.select_all)
+        self.display.bind("<Control-A>", self.select_all)  # con Bloq Mayús
         self.build_keypad_for_mode(self.calc_mode)
         self.apply_dark_mode_colors()
         self.after(100, self._set_window_icon)
+
+
+
+
+
 
 
 def run():

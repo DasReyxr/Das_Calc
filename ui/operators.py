@@ -34,6 +34,8 @@ class OperatorsMixin:
 
     def on_operator(self, event=None):
         """+, -, * sobre la barra de fracción cuando el cursor está en una fracción."""
+        if getattr(self, "inline_mode", False):
+            return None
         if self.calc_mode != "ENG":
             return None
         op = event.char if event and event.char else "+"
@@ -55,6 +57,12 @@ class OperatorsMixin:
             else:
                 return None
 
+            if op in "+-":
+                left = d.get(f"{line}.0", f"{line}.{col}")
+                if left == "" or left[-1].isspace() or left[-1] in "(*/^+-":
+                    return None
+
+            
             new_col = max(col, len(cur_line)) + 1
             for ln in (div_line - 1, div_line, div_line + 1):
                 ensure_col(d, ln, new_col)
@@ -64,3 +72,14 @@ class OperatorsMixin:
         except Exception:
             pass
         return None
+    
+    def sync_inline_mode(self):
+        """Lo llama el switch: copia su estado a inline_mode."""
+        self.inline_mode = bool(self.inline_switch.get())
+        self.display.focus_set()   # que el clic no te saque del display
+
+    def toggle_inline_mode(self, event=None):
+        """Ctrl+M: invierte el switch y sincroniza."""
+        self.inline_switch.toggle()
+        self.sync_inline_mode()    # idempotente, por si toggle() no dispara el command
+        return "break"
