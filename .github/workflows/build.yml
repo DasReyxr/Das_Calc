@@ -25,7 +25,8 @@ jobs:
           - os: ubuntu-latest
             name: linux
             binary: dist/DasCalculator
-            asset: DasCalculator-linux.tar.gz
+            asset: DasCalculator-linux
+            asset2: DasCalculator-linux.tar.gz
           - os: macos-latest      # Apple Silicon (arm64)
             name: macos
             binary: dist/DasCalculator
@@ -55,19 +56,27 @@ jobs:
         run: test -f "${{ matrix.binary }}" || { echo "${{ matrix.binary }} no se generó"; ls -R dist; exit 1; }
 
       # Linux/macOS: empaquetar en tar.gz para conservar el permiso de ejecución
-      - name: Package (unix)
-        if: matrix.name != 'windows'
+      - name: Package (macOS)
+        if: matrix.name == 'macos'
         run: tar -czf "${{ matrix.asset }}" -C dist DasCalculator
 
-      - name: Package (windows)
-        if: matrix.name == 'windows'
+      - name: Package (Linux/Windows)
+        if: matrix.name != 'macos'
         shell: bash
-        run: cp "${{ matrix.binary }}" "${{ matrix.asset }}"
+        run: |
+          cp "${{ matrix.binary }}" "${{ matrix.asset }}"
+          chmod +x "${{ matrix.asset }}"
+
+      - name: Package tar.gz (Linux)
+        if: matrix.name == 'linux'
+        run: tar -czf "${{ matrix.asset2 }}" -C dist DasCalculator
 
       - uses: actions/upload-artifact@v4
         with:
           name: DasCalculator-${{ matrix.name }}
-          path: ${{ matrix.asset }}
+          path: |
+            ${{ matrix.asset }}
+            ${{ matrix.asset2 }}
           if-no-files-found: error
 
   release:
@@ -86,5 +95,6 @@ jobs:
         with:
           files: |
             DasCalculator-windows.exe
+            DasCalculator-linux
             DasCalculator-linux.tar.gz
             DasCalculator-macos.tar.gz
