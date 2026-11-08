@@ -12,6 +12,10 @@ from .operators import OperatorsMixin
 from .popups import PopupsMixin
 from .theme import ThemeMixin
 from .window import WindowMixin
+from .theme import ThemeMixin
+from .update import UpdateMixin
+from .window import WindowMixin
+from core.version import __version__
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -19,11 +23,11 @@ ctk.set_default_color_theme("blue")
 
 class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryMixin, PopupsMixin,
                     FractionEditorMixin, FractionDeleteMixin, OperatorsMixin, EvaluateMixin,
-                    LatexExportMixin, ctk.CTk):
+                    LatexExportMixin, UpdateMixin, ctk.CTk):
     def __init__(self):
         super().__init__()
         self._set_windows_app_id()
-        self.title("Das Calculator")
+        self.title(f"Das Calculator v_{__version__}")
         self.geometry("900x300")
         self.resizable(False, False)
         self._set_window_icon()
@@ -121,6 +125,13 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
         )
         self.mode_btn.pack(side="left", padx=10)
 
+        self.update_btn = ctk.CTkButton(
+            self.controls,
+            text="Update",
+            width=100,
+            command=self.check_for_updates,
+        )
+        self.update_btn.pack(side="left", padx=10)
         # ------ FRAMES ---------
         self.main_frame = ctk.CTkFrame(self)
         # NO se empaqueta aquí: el teclado inicia oculto
