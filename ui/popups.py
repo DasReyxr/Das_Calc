@@ -19,17 +19,21 @@ class PopupsMixin:
     def show_functions_popup(self):
         win = ctk.CTkToplevel(self)
         win.title("Functions")
-        win.geometry("320x400")
+        win.geometry("320x460")
         win.transient(self)
 
         funcs = [
             ("sin(x)", "sin("), ("cos(x)", "cos("), ("tan(x)", "tan("),
-            ("sqrt(x)", "sqrt("), ("ln(x)", "log("), ("log10(x)", "log("),
-            ("exp(x)", "exp("), ("abs(x)", "abs("), ("pi", "pi"), ("e", "e"),
+            ("asin(x)", "asin("), ("acos(x)", "acos("), ("atan(x)", "atan("),
+            ("sqrt(x)", "sqrt("), ("ln(x)", "ln("), ("log10(x)", "log10("),
+            ("log(x,b)", "log("), ("exp(x)", "exp("), ("abs(x)", "abs("),
+            ("pi", "pi"), ("e", "e"),
             ("rect(x,y)", "rect("), ("pol(r,θ)", "pol(")
         ]
+        frame = ctk.CTkScrollableFrame(win)
+        frame.pack(fill="both", expand=True)
         for name, ins in funcs:
-            b = ctk.CTkButton(win, text=name, command=lambda t=ins: self.insert_func_from_popup(t, win))
+            b = ctk.CTkButton(frame, text=name, command=lambda t=ins: self.insert_func_from_popup(t, win))
             b.pack(pady=6, padx=8, fill="x")
 
     def insert_func_from_popup(self, s: str, win):

@@ -115,7 +115,7 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
 
         self.mode_btn = ctk.CTkButton(
             self.controls,
-            text="Change Mode",
+            text="Mode: Degrees",
             width=150,
             command=self.toggle_mode,
         )

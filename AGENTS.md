@@ -67,7 +67,7 @@ Modo nuevo: crear `modes/<nombre>/` y registrarlo en `modes/__init__.py`.
 1. `programmer_format_result` compara `base == "hex"/"bin"` en minúscula pero `base_mode` usa `"HEX"/"BIN"/"OCT"`: esas ramas no se alcanzan y devuelve `None`. (Hoy no afecta: el modo DIG usa `evaluate_programmer`.)
 2. `insert_implicit_multiplication` hace `replace("e", "*e")` global si hay dígito seguido de `e`: puede romper nombres como `exp`.
 3. `export_latex` existe pero ningún botón lo llama.
-4. En el popup de funciones, `ln(x)` y `log10(x)` insertan ambos `log(`.
+
 5. `evaluate_eng` conserva dos `print("DEBUG ...")` del código original.
 
 ## Reglas para cambios
