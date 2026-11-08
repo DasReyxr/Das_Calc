@@ -18,10 +18,11 @@ class UpdateMixin:
         try:
             info = updater.check_latest()
         except Exception as e:
-            self.after(0, lambda: (self._reset_update_btn(),
-                                   messagebox.showerror("Update", f"No se pudo consultar: {e}")))
+            self.after(0, lambda msg=str(e): self._show_update_error(f"No se pudo consultar: {msg}"))
             return
         self.after(0, lambda: self._on_update_result(info))
+
+
 
     def _on_update_result(self, info):
         self._reset_update_btn()
@@ -40,5 +41,8 @@ class UpdateMixin:
         try:
             updater.download_and_replace(url)  # si tiene éxito, reinicia y no regresa
         except Exception as e:
-            self.after(0, lambda: (self._reset_update_btn(),
-                                   messagebox.showerror("Update", f"Falló la actualización: {e}")))
+            self.after(0, lambda msg=str(e): self._show_update_error(f"Falló la actualización: {msg}"))
+
+    def _show_update_error(self, text):
+        self._reset_update_btn()
+        messagebox.showerror("Update", text)
