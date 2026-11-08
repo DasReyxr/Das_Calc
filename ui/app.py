@@ -27,7 +27,7 @@ class EngCalculator(WindowMixin, ThemeMixin, KeypadMixin, DisplayMixin, HistoryM
     def __init__(self):
         super().__init__()
         self._set_windows_app_id()
-        self.title(f"Das Calculator v_{__version__}")
+        self.title(f"Das Calculator v-{__version__}")
         self.geometry("900x300")
         self.resizable(False, False)
         self._set_window_icon()

@@ -22,9 +22,7 @@ def log10(x):
 
 def log(x, base=None):
     """log(x) = ln(x); log(x, b) = log base b de x."""
-    if base is None:
-        return ln(x)
-    if base == 10:
+    if base is None or base == 10:
         return log10(x)
     if base == 2 and not isinstance(x, complex) and x > 0:
         return math.log2(x)  # exacto para potencias de 2
