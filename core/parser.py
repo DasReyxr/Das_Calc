@@ -16,11 +16,8 @@ def Input_Clean(expr: str) -> str:
 def insert_implicit_multiplication(expr: str):
     expr = re.sub(r'(?<![A-Za-z_\d])(\d+(?:\.\d+)?)\s*\(', r'\1*(', expr)
     expr = re.sub(r'\)\s*\(', r')*(', expr)
-    expr = re.sub(r'(\d)\s*([a-zA-Z])', r'\1*\2', expr)
-    expr = expr.replace("pi", "*pi") if re.search(r'\dpi', expr) else expr
-    expr = expr.replace("e", "*e") if re.search(r'\de', expr) else expr
-    expr = expr.replace("*pi", "pi", 1) if expr.startswith("*pi") else expr
-    expr = expr.replace("*e", "e", 1) if expr.startswith("*e") else expr
+    # dígito + letra -> multiplicación, salvo notación científica (4.7e-06, 2E3)
+    expr = re.sub(r'(\d)\s*(?![eE][+\-]?\d)([a-zA-Z])', r'\1*\2', expr)
     return expr
 
 
